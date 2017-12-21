@@ -12,7 +12,7 @@ from sklearn.neighbors import KNeighborsClassifier as KNC
 from model.lrLMM import LowRankLinearMixedModel as trLMM
 from sklearn.metrics import precision_recall_curve, auc
 
-def cross_validation(model, X, y, learningRate, CVNum=5):
+def cross_validation(model, X, y, CVNum=5):
     predL = []
     for Xtrain, ytrain, Xtest, ytest in KFold(X, y, 5):
         # model.setLearningRate(learningRate)
@@ -41,7 +41,7 @@ def run():
     y = data[:284805,-1]
 
     model = trLMM(helperModel=KNC())
-    pred = cross_validation(model, X, y, learningRate=1e-5)
+    pred = cross_validation(model, X, y)
 
     score = evaluation_aucPR(pred, y)
 
