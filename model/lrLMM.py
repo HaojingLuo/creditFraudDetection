@@ -9,14 +9,9 @@ sys.path.append('../')
 
 from helpingMethods import *
 
-from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB
-from sklearn.linear_model import Lasso
-
-
 class LowRankLinearMixedModel:
     def __init__(self, lowRankFlag=True, numintervals=100, ldeltamin=-5, ldeltamax=5, discoverNum=50, mode='lmm',
-                 learningRate=1e-6, realDataFlag=False):
+                 learningRate=1e-6, realDataFlag=False, helperModel=None):
         self.lowRankFlag = lowRankFlag
         self.numintervals = numintervals
         self.ldeltamin = ldeltamin
@@ -25,6 +20,7 @@ class LowRankLinearMixedModel:
         self.mode = mode
         self.learningRate = learningRate
         self.realDataFlag = realDataFlag
+        self.helperModel = helperModel
 
     def setFlag(self, flag):
         self.lowRankFlag = flag
@@ -148,7 +144,7 @@ class LowRankLinearMixedModel:
         print self.weights
         idx = np.where(self.weights!=0)[0]
         Xtrain = self.X[:, idx]
-        clf = Lasso()
+        clf = self.helperModel
         clf.fit(Xtrain, self.y)
         Xtmp = X[:, idx]
         pred = clf.predict(Xtmp)
