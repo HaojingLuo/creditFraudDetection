@@ -140,12 +140,12 @@ class LowRankLinearMixedModel:
         btmp[btmp<mtmp] = 0
         return btmp
 
-    def predict(self, X):
+    def predict_proba(self, X):
         print self.weights
         idx = np.where(self.weights!=0)[0]
         Xtrain = self.X[:, idx]
         clf = self.helperModel
         clf.fit(Xtrain, self.y)
         Xtmp = X[:, idx]
-        pred = clf.predict(Xtmp)
+        pred = clf.predict_proba(Xtmp)
         return pred

@@ -31,8 +31,8 @@ def evaluation_aucPR(pred, y):
 # tr-NB: 0.4898
 # Lasso: 0.05919
 # tr-Lasso: 0.05919
-# knc:
-# tr-knc:
+# knc: 0.7017
+# tr-knc: 0.7969
 
 
 def run():
@@ -40,7 +40,7 @@ def run():
     X = data[:284805,:-1]
     y = data[:284805,-1]
 
-    model = KNC()
+    model = trLMM(helperModel=KNC())
     pred = cross_validation(model, X, y, learningRate=1e-5)
 
     score = evaluation_aucPR(pred, y)
