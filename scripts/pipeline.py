@@ -27,7 +27,6 @@ def cross_validation(model, X, y, CVNum=5):
 
 def evaluation_aucPR(pred, y):
     p, r, t = precision_recall_curve(y, pred)
-    print p
     return auc(r, p)
 
 def run():
@@ -37,7 +36,7 @@ def run():
 
     for method in ['nb', 'knn', 'svm']:
         for features in ['original', 'lmm', 'chi2']:
-            print method, features,
+            print method, '\t', features, '\t',
             startTime = time.time()
             if method == 'nb':
                 model = GaussianNB()
@@ -51,7 +50,8 @@ def run():
                 clf = trLMM(helperModel=model)
                 pred = cross_validation(clf, X, y)
             else:
-                Xtmp = SelectKBest(chi2, k=2).fit_transform(X, y)
+                Xtmp = np.abs(X)
+                Xtmp = SelectKBest(chi2, k=10).fit_transform(Xtmp, y)
                 pred = cross_validation(model, Xtmp, y)
             np.save('../result/pred_'+method+'_'+features, pred)
 
