@@ -1,14 +1,18 @@
 __author__ = 'Haohan Wang'
 
 import numpy as np
-from model.helpingMethods import KFold
 
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import Lasso
 from sklearn.neighbors import KNeighborsClassifier as KNC
 
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
 
+import time
+
+from model.helpingMethods import KFold
 from model.lrLMM import LowRankLinearMixedModel as trLMM
 from sklearn.metrics import precision_recall_curve, auc
 
@@ -26,26 +30,38 @@ def evaluation_aucPR(pred, y):
     print p
     return auc(r, p)
 
-#scores:
-# NB: 0.4484
-# tr-NB: 0.4898
-# Lasso: 0.05919
-# tr-Lasso: 0.05919
-# knc: 0.7017
-# tr-knc: 0.7969
-
-
 def run():
     data = np.load('../data/data.npy')
     X = data[:284805,:-1]
     y = data[:284805,-1]
 
-    model = trLMM(helperModel=KNC())
-    pred = cross_validation(model, X, y)
+    for method in ['nb', 'knn', 'svm']:
+        for features in ['original', 'lmm', 'chi2']:
+            print method, features,
+            startTime = time.time()
+            if method == 'nb':
+                model = GaussianNB()
+            elif method == 'knn':
+                model = KNC()
+            else:
+                model = SVC(probability=True, kernel='linear')
+            if features == 'original':
+                pred = cross_validation(model, X, y)
+            elif features == 'lmm':
+                clf = trLMM(helperModel=model)
+                pred = cross_validation(clf, X, y)
+            else:
+                Xtmp = SelectKBest(chi2, k=2).fit_transform(X, y)
+                pred = cross_validation(model, Xtmp, y)
+            np.save('../result/pred_'+method+'_'+features, pred)
 
-    score = evaluation_aucPR(pred, y)
+            seconds = time.time() - startTime
 
-    print score
+            np.save('../result/seconds_'+method+'_'+features, seconds)
+
+            score = evaluation_aucPR(pred, y)
+
+            print score
 
 if __name__ == '__main__':
     run()
