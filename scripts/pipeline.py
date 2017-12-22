@@ -43,7 +43,7 @@ def run():
             elif method == 'knn':
                 model = KNC()
             else:
-                model = SVC(probability=True, kernel='linear')
+                model = SVC(probability=True, kernel='linear', tol=1)
             if features == 'original':
                 pred = cross_validation(model, X, y)
             elif features == 'lmm':
